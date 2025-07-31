@@ -12,7 +12,7 @@ def esprit_doa(X, d, wavelength, num_sources=1):
     Returns:
         DOA estimate in radians
     """
-    from scipy.linalg import svd, eig
+    from scipy.linalg import svd
     R = X @ X.conj().T  # Spatial covariance
     U, S, Vh = svd(R)
     Us = U[:, :num_sources]
@@ -24,5 +24,8 @@ def esprit_doa(X, d, wavelength, num_sources=1):
     eigvals = np.linalg.eigvals(Phi)
 
     angles = -np.angle(eigvals)
-    theta = np.arcsin(angles * wavelength / (2 * np.pi * d))
+    x = angles * wavelength / (2 * np.pi * d)
+    x = np.clip(x, -1, 1)
+    theta = np.arcsin(x)
+    
     return np.real(theta)
