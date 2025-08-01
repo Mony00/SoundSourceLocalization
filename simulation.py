@@ -43,7 +43,7 @@ source_location = np.array([1., 1.])
 room.add_source(source_location, signal=signal)
 
 # Add microphone array
-R = pra.square_2D_array(center=[2., 1.5], M=2, N=2, phi=0, d=0.04) 
+R = pra.linear_2D_array(center=[2., 1.5], M=4, phi=0, d=0.04) 
 room.add_microphone_array(pra.MicrophoneArray(R, room.fs))
 
 room.simulate()
@@ -70,7 +70,9 @@ actual_azimuth = np.arctan2(vector_to_source[1], vector_to_source[0])
 estimated_azimuths = doa.azimuth_recon
 
 #-------------ESPRIT DOA estimation--------------
-freq_bin = min(2, X.shape[0] - 1) #it has to be within frequency range
+bin_energy = np.linalg.norm(X[1:], axis=(1, 2))  # Skip bin 0
+freq_bin = int(np.argmax(bin_energy)+ 1)         # Offset by 1
+print(f"freq bin: {freq_bin}, type: {type(freq_bin)}")
 X_esprit = X[freq_bin, :, :] # shape: (num_mics, num_frames)
 
 f_esprit = freq_bin * fs / nfft # frequency in Hz
