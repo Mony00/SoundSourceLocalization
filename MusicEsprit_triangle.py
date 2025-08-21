@@ -121,7 +121,7 @@ plt.subplot(233)
 plt.plot(Angles, psindB)
 plt.plot(DoAsMUSIC, psindB[DoAsMUSIC_idx], 'x')
 plt.title('MUSIC')
-plt.legend(['pseudo spectrum', 'Estimated DoAs'])
+plt.legend(['pseudo spectrum', 'Estimated DoAs'], loc = "lower left")
 
 # ESPRIT
 DoAsESPRIT = esprit_triangular(CovMat, L, N)

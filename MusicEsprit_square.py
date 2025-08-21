@@ -30,7 +30,7 @@ def music(CovMat, L, N, array, Angles):
     psindB = 10 * np.log10(pspectrum / pspectrum.max())
     
     # Improved peak finding
-    peaks, _ = ss.find_peaks(psindB, height=-3, distance=10)  # Adjusted parameters
+    peaks, _ = ss.find_peaks(psindB)  # Adjusted parameters
     peak_vals = psindB[peaks]
     topL_idx = peaks[np.argsort(peak_vals)[-L:]]  # Get top L peaks
     
@@ -39,7 +39,8 @@ def music(CovMat, L, N, array, Angles):
 def esprit(CovMat, L, N):
     _, U = LA.eig(CovMat)
     S = U[:, 0:L]
-    Phi = LA.pinv(S[:-1]) @ S[1:]
+    S1, S2 = S[0:N-1, :], S[1:N, :]    # overlapping partitions
+    Phi = LA.pinv(S1) @ S2
     eigs, _ = LA.eig(Phi)
     DoAsESPRIT = np.arcsin(np.angle(eigs) / np.pi)
     return DoAsESPRIT
@@ -48,7 +49,7 @@ def esprit(CovMat, L, N):
 np.random.seed(6)
 lamda = 1
 L = 2  # number of sources
-snr = 10
+snr = 15
 
 # 3x3 square array
 side = 3
@@ -73,7 +74,7 @@ h = np.zeros(N, dtype=complex)
 for i in range(L):
     h += Alphas[i] * array_response_vector_2d(array, Thetas[i])
 
-Angles = np.linspace(-np.pi/2, np.pi/2, 360)
+Angles = np.linspace(-np.pi/2, np.pi/2, 720)
 hv = np.zeros(Angles.size)
 for j, angle in enumerate(Angles):
     a = array_response_vector_2d(array, angle)
@@ -92,7 +93,7 @@ plt.title('Correlation')
 plt.legend(['Correlation power', 'Actual DoAs'])
 
 # Create multiple realizations (snapshots)
-numrealization = 100
+numrealization = 500
 H = np.zeros((N, numrealization), dtype=complex)
 for it in range(numrealization):
     htmp = np.zeros(N, dtype=complex)
